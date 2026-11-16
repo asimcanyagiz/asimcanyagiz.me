@@ -79,4 +79,13 @@ if grep -Eqi '297[,\.]?859|294[,\.]?824|282[,\.]?145|revenue|income|salary|husey
   exit 1
 fi
 
+# Experience duration must match the UK Global Talent evidence pack
+# ("a little over four years", Swift since July 2022). Guard against the old
+# "past five years" claim coming back.
+if grep -Eqi 'past five years|five years of experience|5\+? years' "$root/index.html"; then
+  echo "homepage claims five years of experience; the evidence pack says over four" >&2
+  exit 1
+fi
+grep -q 'For over four years' "$root/index.html"
+
 echo "site content checks passed"
