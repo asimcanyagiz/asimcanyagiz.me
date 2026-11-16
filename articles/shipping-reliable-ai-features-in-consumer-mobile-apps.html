@@ -27,7 +27,7 @@
     "headline": "Shipping Reliable AI Features in Consumer Mobile Apps",
     "description": "A production-minded architecture for reliable AI features in consumer mobile apps.",
     "datePublished": "2026-08-28",
-    "dateModified": "2026-08-28",
+    "dateModified": "2026-11-16",
     "author": {"@type": "Person", "name": "Asım Can Yağız", "url": "https://asimcanyagiz.me/"},
     "publisher": {"@type": "Person", "name": "Asım Can Yağız"},
     "mainEntityOfPage": "https://asimcanyagiz.me/articles/shipping-reliable-ai-features-in-consumer-mobile-apps.html"
@@ -47,7 +47,7 @@
         <p class="eyebrow">Mobile engineering · AI reliability</p>
         <h1>Shipping reliable AI features in <em>consumer mobile apps.</em></h1>
         <p class="article-deck">A production AI feature is not a model call inside a polished screen. It is a controlled system that protects the user when inputs, networks, providers and outputs behave unpredictably.</p>
-        <div class="article-meta"><span>By Asım Can Yağız</span><span>28 August 2026</span><span>9 min read</span></div>
+        <div class="article-meta"><span>By Asım Can Yağız</span><span>Published 28 August 2026</span><span>Updated 16 November 2026</span><span>9 min read</span></div>
       </header>
 
       <div class="article-layout">
@@ -64,15 +64,15 @@
         </aside>
 
         <div class="article-body">
-          <p class="lead">AI prototypes are usually built around the happy path: collect an input, send it to a model and render the response. Consumer mobile software lives everywhere else.</p>
+          <p class="lead">AI prototypes usually cover the happy path: collect an input, send it to a model, then render the response. Consumer mobile software has to handle everything around that path.</p>
           <p>It runs on unstable networks and older devices. Users interrupt requests, submit unexpected inputs, change languages and return after an app version has changed. Providers time out. Structured output becomes almost structured. Safety policies reject a request that worked yesterday. A release that improves average quality can quietly increase latency or cost.</p>
-          <p>The engineering task is therefore not to make a model appear reliable. It is to build a product boundary that contains uncertainty. The following is the architecture I use to reason about that boundary.</p>
+          <p>The engineering task is to contain uncertainty at the product boundary. This is the architecture I use to reason about that work.</p>
 
           <h2 id="contract">1. Define a product contract before choosing the model</h2>
           <p>A feature needs a contract that the product can enforce. It should state the accepted inputs, the useful output, the maximum wait a user should tolerate, the data that may be retained, the failure behaviours and the actions the interface will allow next.</p>
           <p>This contract must be expressed in product terms. “Return valid JSON” is an implementation requirement. “Give the user three editable suggestions without losing their original input” is a product contract.</p>
           <div class="principle"><span>Principle 01</span><p>The mobile experience owns the promise. The model is one replaceable component used to fulfil it.</p></div>
-          <p>Once the contract is explicit, model selection becomes an engineering decision. A smaller model may be sufficient for classification. A slower model may be justified for a high-value creative task. A deterministic local rule may be safer than generation. The system can route by task instead of forcing one provider to solve every problem.</p>
+          <p>With the contract defined, model selection becomes an engineering decision. A smaller model may be enough for classification. A slower model may make sense for a high-value creative task. A deterministic local rule may be safer than generation. The system can route by task instead of asking one provider to solve every problem.</p>
 
           <h2 id="states">2. Model every state the user can encounter</h2>
           <p>Loading and error are not enough. A robust AI flow normally needs distinct states for validation, queued work, generation, partial progress, completion, recoverable failure, policy refusal, connectivity loss and cancellation.</p>
@@ -84,7 +84,7 @@
             <li>A parsing failure may be recoverable server-side without asking the user to start again.</li>
             <li>A cancelled request must not later overwrite a newer result.</li>
           </ul>
-          <p>On the client, I prefer one explicit state machine over several loosely related booleans. It prevents impossible combinations such as showing a completed result while a stale request still controls the loading state. Each transition can be tested, observed and connected to one interface behaviour.</p>
+          <p>On the client, I prefer one explicit state machine to several loosely related booleans. It prevents combinations such as showing a completed result while an old request still controls the loading state. Each transition can be tested, observed, and tied to an interface behaviour.</p>
 
           <h2 id="boundary">3. Keep provider control behind a server boundary</h2>
           <p>A mobile client should not be responsible for provider credentials, prompt assembly, routing rules or unrestricted model parameters. Those concerns belong behind a controlled service boundary.</p>
@@ -97,7 +97,7 @@
           <h2 id="observe">4. Build observability without collecting the conversation</h2>
           <p>Reliable operation requires enough information to reconstruct what happened. It does not require storing every private input and output.</p>
           <p>Useful operational fields include a request identifier, app version, feature version, prompt version, model route, locale, duration, retry count, validation result, fallback path and a privacy-safe outcome category. Together, these allow a team to answer whether a regression is tied to one release, language, provider or configuration.</p>
-          <p>Raw content should be minimised, redacted or avoided according to the feature’s needs. Debug convenience is not a sufficient reason to create a permanent dataset of sensitive user material. If examples are retained for evaluation, consent, access, retention and deletion rules need to be designed as part of the system.</p>
+          <p>Minimise, redact, or avoid raw content based on the feature’s needs. Debugging convenience alone does not justify creating a permanent dataset of sensitive user material. If examples are kept for evaluation, design consent, access, retention, and deletion rules as part of the system.</p>
           <p>Client and server events should share the same request identifier. Otherwise a mobile timeout and a server completion look like unrelated facts, making it difficult to find duplicate work, stale results and provider latency hidden behind a generic error screen.</p>
 
           <h2 id="evaluate">5. Evaluate the product system, not only the answer</h2>
@@ -115,10 +115,10 @@
           <p>The mobile flow also needs behavioural tests. Given a request that times out, when the user retries, then the original input should remain and only the latest result should render. Given an old cached response, when the schema is no longer supported, then the app should discard it safely rather than crash. These are product guarantees, not model benchmarks.</p>
 
           <h2 id="rollout">6. Treat prompts and models as production releases</h2>
-          <p>A prompt change can alter user-visible behaviour as much as an application release. It needs an owner, a version, an evaluation result, a rollout plan and a rollback path.</p>
-          <p>I prefer progressive exposure: internal testing, a small production cohort, monitored expansion and automatic or manual rollback thresholds. The exact percentages matter less than the ability to compare the new configuration against a stable baseline.</p>
+          <p>A prompt change can alter user-visible behaviour as much as an application release. Give it an owner and version, evaluate it, and plan how to roll it out and back.</p>
+          <p>I prefer progressive exposure: internal testing, a small production cohort, monitored expansion, and automatic or manual rollback thresholds. The exact percentages matter less than comparing the new configuration with a stable baseline.</p>
           <p>Rollout metrics should include more than provider success. Watch end-to-end completion, latency distribution, retries, user corrections, saves, reports and return behaviour. A response can be technically successful while creating more work for the user.</p>
-          <div class="principle"><span>Principle 06</span><p>If a remote configuration can change the experience instantly, it deserves the same discipline as code that ships through a store.</p></div>
+          <div class="principle"><span>Principle 06</span><p>Remote configuration can change the experience instantly, so apply the same release discipline as store-shipped code.</p></div>
 
           <h2>A practical production gate</h2>
           <p>Before exposing an AI feature broadly, I want the team to answer:</p>
@@ -134,8 +134,8 @@
           </ul>
 
           <h2>Reliability is the feature users remember</h2>
-          <p>Users do not separate the model from the rest of the product. They experience one system. When a request disappears, a retry charges twice or a confident answer breaks the next screen, the distinction between provider and application architecture is irrelevant to them.</p>
-          <p>The durable engineering advantage is a controlled boundary around probabilistic capability: explicit contracts, complete states, stable interfaces, privacy-aware observability, layered evaluation and reversible rollout. That system turns an impressive AI response into a mobile feature people can trust repeatedly.</p>
+          <p>Users experience the model and the app as one system. If a request disappears, a retry charges twice, or an answer breaks the next screen, they need the product to recover regardless of which component failed.</p>
+          <p>Reliable AI features need a controlled boundary around probabilistic output: explicit contracts, complete states, stable interfaces, privacy-aware observability, layered evaluation, and reversible rollout. Together, these practices make a feature dependable enough for repeated use.</p>
 
           <footer class="article-author">
             <p class="eyebrow">About the author</p>

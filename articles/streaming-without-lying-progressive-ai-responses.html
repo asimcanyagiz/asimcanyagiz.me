@@ -27,7 +27,7 @@
     "headline": "Streaming Without Lying: Progressive AI Responses That Still Honor a Contract",
     "description": "Keep the speed of streaming AI responses without acting on unvalidated output by separating the display path from a validation-gated commit path.",
     "datePublished": "2026-09-08",
-    "dateModified": "2026-09-08",
+    "dateModified": "2026-11-16",
     "author": {"@type": "Person", "name": "Asım Can Yağız", "url": "https://asimcanyagiz.me/"},
     "publisher": {"@type": "Person", "name": "Asım Can Yağız"},
     "mainEntityOfPage": "https://asimcanyagiz.me/articles/streaming-without-lying-progressive-ai-responses.html"
@@ -46,8 +46,8 @@
       <header class="article-hero">
         <p class="eyebrow">Mobile engineering · AI reliability</p>
         <h1>Streaming without <em>lying.</em></h1>
-        <p class="article-deck">Streaming makes an AI feature feel fast, but a validated result cannot exist until the response is complete. Here is how to keep the speed without acting on data you have not verified.</p>
-        <div class="article-meta"><span>By Asım Can Yağız</span><span>8 September 2026</span><span>7 min read</span></div>
+        <p class="article-deck">Let users see a response as it arrives. Keep actions disabled until the complete result has passed validation.</p>
+        <div class="article-meta"><span>By Asım Can Yağız</span><span>8 September 2026</span><span>Updated 16 November 2026</span><span>7 min read</span></div>
       </header>
 
       <div class="article-layout">
@@ -64,41 +64,40 @@
         </aside>
 
         <div class="article-body">
-          <p class="lead">Streaming is the cheapest way to make an AI feature feel fast. Tokens appear one after another, the screen looks alive, and perceived latency drops even when the real latency has not moved.</p>
-          <p>So teams reach for it early, and they are right to — right up until they wire an <em>action</em> to the stream. Here is the tension nobody puts in the demo: streaming and correctness pull in opposite directions. The user sees content as it arrives, but a validated, structured result cannot exist until the response is complete. If you render the stream as though it were final, you are showing the user — and sometimes acting on — data your app has not yet verified.</p>
-          <p>That is the lie in naive streaming: it presents partial, unvalidated output with the confidence of a finished answer. This piece is about keeping the speed without telling that lie. The trick is to separate what you <em>show</em> from what you <em>trust</em>, and to never let a half-formed response drive a consequence.</p>
+          <p class="lead">Streaming can make an AI feature feel faster without shortening the request. Users see tokens arrive while the model is still working, instead of waiting for a blank screen to fill.</p>
+          <p>The difficulty starts when that preview controls an action. A structured response cannot pass validation until it is complete. If the app enables Save or Apply while tokens are still arriving, it lets the user act on data it has not checked.</p>
+          <p>I separate the preview from the result the application can use. Text can appear progressively, but a partial response must not change stored data or trigger a paid operation. The interface needs to make that provisional status clear.</p>
 
           <h2 id="clocks">1. Two clocks in one response</h2>
-          <p>A streamed response has two moments that teams love to collapse into one.</p>
-          <p>The first is <strong>first useful output</strong> — the instant something worth showing has arrived. This is what makes streaming feel fast, and it is fine to optimise for it. The second is <strong>completion and validation</strong> — the instant the whole response is present, parses, and conforms to your contract. This is the only moment the result becomes actionable.</p>
-          <p>Naive code treats the first moment as the second. Everything downstream — enabling a Save button, applying a change, committing structured data, firing a paid side effect — gets attached to the stream instead of to validation. Then the final tokens change the meaning, or the response fails to parse, or a safety filter truncates it, and the app has already acted on something that no longer exists.</p>
+          <p>Measure first useful output separately from completion and validation. The first tells you when there is something worth showing. The second tells you when the whole response is present, parses successfully and meets the output contract.</p>
+          <p>A Save button, a state change or a paid side effect belongs after the second event. If it runs after the first, later tokens can change the meaning of data the app has already used. The response might also fail to parse or be cut short by a safety filter.</p>
           <div class="principle"><span>Principle 01</span><p>Separate what you show from what you trust. The display path can be optimistic; the commit path waits.</p></div>
 
           <h2 id="gate">2. Show the surface, gate the action</h2>
           <p>Split the response into what the user may see while it streams and what the app may do only after it validates.</p>
-          <p>Progressive display is fine for the human-readable surface. Render tokens as they arrive; let it feel live. But commit is gated. Any control that causes a consequence — apply, save, send, purchase, replace state — stays disabled until the complete response has parsed and validated against your contract.</p>
+          <p>Render the text as it arrives. Keep Apply, Save, Send, Purchase and any other control that changes state disabled until the complete response has parsed and passed validation.</p>
           <div class="system-map" aria-label="Streaming commit flow"><span>Stream</span><i>→</i><span>Complete</span><i>→</i><span>Validate</span><i>→</i><span>Commit</span><i>→</i><span>Action</span></div>
-          <p>That single rule kills a whole class of bugs. The user still perceives speed, because text is moving, while the app refuses to let anyone act on unverified data. When validation succeeds, you enable the action and, if you need to, reconcile the display: swap the optimistically streamed text for the validated version. Usually they match. When they do not, the validated version wins, and the user was never able to act on the difference.</p>
+          <p>Once validation succeeds, enable the action and reconcile the preview with the validated result. They will usually match. When they differ, replace the preview before the user can act on it. This preserves the benefit of seeing progress without letting provisional data affect the rest of the app.</p>
 
           <h2 id="structure">3. Structure is what makes this non-negotiable</h2>
-          <p>If the response is free-form prose that gets shown and forgotten, streaming is nearly risk-free. The danger scales with structure. A response that has to yield an object with an action, an amount and a list of targets cannot be trusted until the closing brace has arrived and the object has validated. Partial JSON is not “a little bit of an object.” It is a syntactically incomplete string that will either fail to parse or — with a lenient parser — parse into something subtly wrong, which is worse.</p>
-          <p>So never act on a partial parse. If you want to give feedback during a structured stream, drive it from a separate, explicitly-partial text field, not from the machine object. Parse defensively, only on completion, and treat a parse or validation failure at the end as a full failure of the response — not a “mostly worked.”</p>
+          <p>Display-only prose does not carry the same risk of committing incorrect application state. An object containing an action, an amount and a list of targets does. Wait for the closing brace and validate the whole object. Partial JSON may fail to parse; a lenient parser may accept it and produce an incorrect object.</p>
+          <p>For progress during a structured response, use a separate text field explicitly marked as partial. Do not drive actions from a partial parse of the machine-readable object. If parsing or validation fails at completion, treat the response as failed.</p>
 
           <h2 id="cancellation">4. Cancellation is part of streaming, not an afterthought</h2>
-          <p>A stream is a long-lived operation on a device that gets interrupted constantly. The user navigates away, backgrounds the app, edits the input, or starts a new request while the old stream is still flowing. Streaming without a currency rule just reintroduces the stale-response problem in a new place.</p>
-          <p>Bind each stream to the request lifecycle. Give every request an identifier. When a newer request starts, or the user cancels, mark the older stream stale. If a stale stream later completes, it must not be presented and must not commit — its tokens are discarded and the event is recorded as a stale-discard under the same request id. The interface only ever presents and commits the current request’s completed, validated result.</p>
+          <p>A user can leave the screen, background the app, edit the input or start another request while a stream is running. The app needs a rule for deciding which request is still current.</p>
+          <p>Give each request an identifier. When the user cancels or starts a replacement, mark the old stream stale. Discard any further tokens from it. If it completes later, record the discard under its request id and neither present nor commit its result. Only the current request can supply a completed, validated result to the interface.</p>
 
           <h2 id="failure">5. Failing mid-stream without leaving a mess</h2>
-          <p>Streams fail halfway. The connection drops, the provider errors after emitting some tokens, a safety filter cuts the response short. If you have been rendering optimistically, you now have partial content on screen and nothing valid behind it. Handle it explicitly:</p>
+          <p>A connection can drop after some tokens arrive. A provider can return an error or a safety filter can stop the response. The preview is then incomplete, and the app needs to recover:</p>
           <ul>
-            <li>Keep partial display content clearly provisional until commit. On failure, discard it and show an honest failure or fallback — not a frozen half-answer.</li>
+            <li>Mark the preview as provisional until commit. If the response fails, discard the preview and show a failure or fallback.</li>
             <li>Commit nothing. No structured data, no side effect, because the response never validated.</li>
             <li>Make recovery a real state, not an exception swallowed into a spinner that never ends.</li>
           </ul>
-          <p>And guard side effects with idempotency. A retry after a mid-stream failure must not double-apply a change or double-charge a paid operation. The stream is a delivery mechanism; the effect has to be tied to a completed, validated, idempotent commit.</p>
+          <p>Use idempotency for side effects as well. Retrying after a stream fails must not apply the same change twice or charge twice. Tie the effect to the completed, validated commit.</p>
 
           <h2 id="machine">6. Model it as a state machine</h2>
-          <p>A pile of booleans (<code>isStreaming</code>, <code>isDone</code>, <code>hasError</code>) drifts out of sync the moment two of them can be true at once. Model the response as a state machine instead, where every transition is explicit and observable:</p>
+          <p>Separate booleans such as <code>isStreaming</code>, <code>isDone</code> and <code>hasError</code> can represent contradictory states. A state machine makes the allowed transitions explicit and gives telemetry something consistent to record:</p>
           <table>
             <thead><tr><th>From</th><th>Event</th><th>To</th><th>Effect</th></tr></thead>
             <tbody>
@@ -109,9 +108,9 @@
               <tr><td>streaming</td><td>mid-stream error</td><td>failed</td><td>discard, recover</td></tr>
             </tbody>
           </table>
-          <p>The two states worth watching in production are <strong>discarded</strong> — are users routinely outrunning your latency? — and <strong>failed after validating</strong> — are completed streams failing the contract, which would mean streaming is masking a structure problem you would otherwise have caught.</p>
+          <p>Watch the discarded rate to see whether users routinely move on before a request finishes. Also track failures during validation: a stream can look healthy while it is arriving and still fail the output contract at the end.</p>
 
-          <h3>Given–When–Then</h3>
+          <h3>Behavioural tests</h3>
           <ul class="checklist">
             <li>Given a streamed structured response still in progress, when the user views it, then a progressive preview renders but every consequential action stays disabled until the full response validates.</li>
             <li>Given a stream that fails contract validation at completion, when a preview was already shown, then the app discards the preview, commits nothing, and shows a clear failure or fallback.</li>
@@ -120,8 +119,7 @@
           </ul>
 
           <h2>When this is not worth it</h2>
-          <p>If responses are short, streaming buys little perceived speed and the machinery is not worth it — wait for completion and render once. If the output is pure display text with no structure and no downstream action, optimistic streaming is essentially free, so skip the commit-gating. The full discipline pays off precisely when the response is structured, drives an action or a paid side effect, or lives in a UI where users routinely cancel and re-ask.</p>
-          <p>There, the goal is easy to state and easy to get wrong: let the interface feel as fast as the first token, while the application trusts nothing until the last one has arrived and validated.</p>
+          <p>For a short response, waiting for completion and rendering once may be simpler. Display-only text with no downstream action does not need the same commit controls. Use the full state machine when responses are structured, trigger actions or charges, or appear in a screen where users often cancel and start again.</p>
 
           <footer class="article-author">
             <p class="eyebrow">About the author</p>

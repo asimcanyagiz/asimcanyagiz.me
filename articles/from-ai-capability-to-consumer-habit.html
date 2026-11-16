@@ -27,7 +27,7 @@
     "headline": "From AI Capability to Consumer Habit",
     "description": "A practical framework for turning an AI capability into a focused, reliable consumer mobile product people choose to use again.",
     "datePublished": "2026-08-28",
-    "dateModified": "2026-08-28",
+    "dateModified": "2026-11-16",
     "author": {
       "@type": "Person",
       "name": "Asım Can Yağız",
@@ -54,7 +54,7 @@
         <p class="eyebrow">Product systems · AI consumer apps</p>
         <h1>From AI capability to <em>consumer habit.</em></h1>
         <p class="article-deck">A model can produce an impressive answer in seconds. A product earns a place on someone’s phone by being useful, predictable, and worth returning to.</p>
-        <div class="article-meta"><span>By Asım Can Yağız</span><span>28 August 2026</span><span>10 min read</span></div>
+        <div class="article-meta"><span>By Asım Can Yağız</span><span>Published 28 August 2026</span><span>Updated 16 November 2026</span><span>10 min read</span></div>
       </header>
 
       <div class="article-layout">
@@ -71,8 +71,8 @@
         </aside>
 
         <div class="article-body">
-          <p class="lead">The easiest AI product to build is a demo. A user provides input, a model returns something surprising, and for a moment the experience feels like magic. The difficult part begins after that moment: why should the user return tomorrow?</p>
-          <p>Consumer mobile products operate under a harsh constraint. They compete for a small amount of attention against mature products that already own a habit. Adding a model does not remove that constraint. It raises the user’s expectations while introducing latency, uncertainty, cost, and new ways to break trust.</p>
+          <p class="lead">A demo is often the easiest AI product to build. A user provides input, a model returns something surprising, and for a moment the experience feels like magic. The harder question comes next: why should the user return tomorrow?</p>
+          <p>Consumer mobile products compete for limited attention against mature products that already have a place in people’s routines. Adding a model does not remove that constraint. It raises expectations while adding latency, uncertainty, cost, and new ways to break trust.</p>
           <p>I use the following framework to move from a raw model capability to a product that can earn repeated use.</p>
 
           <h2 id="job">1. Start with the recurring job, not the model</h2>
@@ -91,7 +91,7 @@
             <li><b>Useful resolution:</b> an answer, creation, recommendation, or completed task that feels specific to the user.</li>
             <li><b>Accumulated value:</b> history, preferences, saved work, progress, or personal context that improves the next session.</li>
           </ol>
-          <p>The fourth part matters most. If every session starts from zero, the app is easy to replace. When the product remembers appropriately, preserves useful work, and reduces repeated setup, continued use becomes rational rather than artificially forced.</p>
+          <p>The fourth part is often the difference between a useful loop and a disposable feature. If every session starts from zero, the app is easy to replace. When it remembers appropriately, preserves useful work, and reduces repeated setup, people have a reason to keep using it.</p>
           <p>Accumulated value must remain under user control. Memory should be visible enough to understand, editable where practical, and removable. Retention built on hidden data practices eventually becomes a trust problem.</p>
 
           <h2 id="system">3. Treat the AI as a system, not a single API call</h2>
@@ -101,7 +101,7 @@
             <span>User intent</span><i>→</i><span>Context</span><i>→</i><span>Model &amp; tools</span><i>→</i><span>Validation</span><i>→</i><span>Useful result</span>
           </div>
           <p>I prefer to make these layers explicit. Prompts and model configuration should be versioned. Structured outputs should be validated. Expensive or risky operations should be idempotent. Timeouts need a useful recovery path. Analytics should identify the configuration that produced an outcome without collecting unnecessary private content.</p>
-          <p>The goal is not to eliminate uncertainty; generative systems are probabilistic. The goal is to place boundaries around that uncertainty so the rest of the product behaves predictably.</p>
+          <p>Generative systems are probabilistic, so uncertainty cannot be eliminated. The aim is to contain it so the rest of the product behaves predictably.</p>
 
           <h2 id="trust">4. Build trust visibly</h2>
           <p>AI products ask users to tolerate two kinds of uncertainty: what the system will produce and what happens to the information they provide. Product design must address both.</p>
@@ -114,10 +114,10 @@
             <li>Provide a path to retry, edit, report, or delete.</li>
             <li>Set clear boundaries for sensitive or high-stakes use cases.</li>
           </ul>
-          <p>A confident interface should not pretend the model is infallible. The strongest experience tells the user what the system can do, gives them control when it cannot, and avoids making certainty part of the visual style.</p>
+          <p>A confident interface does not need to pretend the model is infallible. It explains what the system can do, gives the user control when it cannot, and avoids presenting uncertainty as certainty.</p>
 
           <h2 id="measure">5. Measure behaviour across the whole loop</h2>
-          <p>Generation count is an operational metric, not a product outcome. It says that the system ran. It does not say whether the result helped.</p>
+          <p>Generation count tells you the system ran. It does not tell you whether the result helped.</p>
           <p>I separate measurement into four layers:</p>
           <table>
             <thead><tr><th>Layer</th><th>Question</th><th>Example signals</th></tr></thead>
@@ -132,9 +132,9 @@
           <p>Good instrumentation keeps these trade-offs visible. It also records experiment exposure so a team can connect behaviour to the exact product and model configuration a user experienced.</p>
 
           <h2 id="compound">6. Make every release improve the system</h2>
-          <p>Small teams cannot win by treating every app, locale, experiment, and release as a separate operation. The advantage comes from turning repeated work into shared infrastructure and reusable judgment.</p>
+          <p>For a small team, treating every app, locale, experiment, and release as a separate operation creates repeated work. Shared infrastructure and reusable judgment can reduce that overhead.</p>
           <p>That can mean a common layer for model configuration, analytics conventions, subscription state, localisation checks, release automation, prompt evaluation, or failure reporting. The exact abstraction matters less than the discipline: when a problem appears twice, ask whether the solution should become part of the operating system.</p>
-          <div class="principle"><span>Principle 06</span><p>A portfolio becomes smarter when lessons move between products faster than mistakes repeat.</p></div>
+          <div class="principle"><span>Principle 06</span><p>Share lessons between products so the same mistakes are less likely to recur.</p></div>
           <p>There is a danger here. Shared systems can spread a bad assumption just as efficiently as a good one. Reuse should therefore include versioning, controlled rollout, observability, and a way for individual products to opt out when their context differs.</p>
 
           <h2>A practical release gate</h2>
@@ -151,8 +151,8 @@
           <p>If those answers are missing, the feature may still make a good demo. It is not yet a dependable product.</p>
 
           <h2>The real product is the loop</h2>
-          <p>Models will keep changing. Costs will fall, context windows will grow, and today’s impressive capability will become a commodity. A durable consumer product cannot depend on permanent access to surprise.</p>
-          <p>Its advantage is the loop around the model: a sharply defined job, low-friction interaction, accumulated value, visible trust, reliable infrastructure, and a measurement system that helps the team learn. That is the distance between an AI capability someone tries and a product they choose to keep.</p>
+          <p>Models will keep changing. Costs will fall, context windows will grow, and capabilities that seem impressive today will become common. A durable consumer product cannot rely on novelty alone.</p>
+          <p>Its advantage comes from the loop around the model: a clear job, low-friction interaction, accumulated value, visible trust, reliable infrastructure, and measurement that helps the team learn. That is what turns an AI capability someone tries into a product they choose to keep.</p>
 
           <footer class="article-author">
             <p class="eyebrow">About the author</p>
